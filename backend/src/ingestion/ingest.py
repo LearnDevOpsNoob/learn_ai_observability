@@ -25,6 +25,7 @@ class IngestionPipeline:
 
         documents = self.loader.load()
 
+        self.vectordb.delete_collection()
         self.vectordb.create_collection(self.embedder.dimensions)
 
         point_id = 0  
@@ -50,4 +51,4 @@ class IngestionPipeline:
 
                 point_id += 1
 
-                print(f"Indexed {point_id} chunk(s) into Qdrant.")
+                # print(f"Indexed {point_id} chunk(s) into Qdrant.")

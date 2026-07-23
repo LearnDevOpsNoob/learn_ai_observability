@@ -1,19 +1,28 @@
 from src.ingestion.ingest import IngestionPipeline
+from src.retrieval.retrieval import RetrievalPipeline
 
 def main():
     print("Observe & Understand")
 
-    pipeline = IngestionPipeline(documents_path="data/documents")
+    ingest_pipeline = IngestionPipeline(documents_path="data/documents")
 
-    pipeline.run()
+    ingest_pipeline.run()
+    print("Ingestio COmplete")
 
-    # for chunk in chunks:
-    #     print("-" * 50)
-    #     print(f"Source : {chunk['source']}")
-    #     print(f"Chunk  : {chunk['chunk_id']}")
-    #     print(chunk["content"][:150])
+    retrieval_pipeline = RetrievalPipeline()
 
+    results = retrieval_pipeline.search(
+        "What is distributed tracing?"
+    )
 
+    if not results:
+        print(f"Either retrive failed or no results")
+
+    for result in results:
+        print(result.score)
+        print(result.source)
+        print(result.content)
+        print("-" * 50)
 
 if __name__ == "__main__":
     main()

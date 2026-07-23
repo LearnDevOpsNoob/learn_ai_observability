@@ -26,9 +26,6 @@ class DocumentLoader:
                 f"No Markdown (.md) files found in {self.documents_path}"
             )
 
-        # print(f"Found {len(markdown_files)} document(s).") 
-
-
         documents = []   
 
         for file_path in markdown_files:

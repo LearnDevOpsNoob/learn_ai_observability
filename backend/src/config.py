@@ -24,6 +24,8 @@ settings = Settings(
 CHUNK_SIZE: int = 500
 CHUNK_OVERLAP: int = 100
 
+TOP_K = 3
+SCORE_THRESHOLD = 0.0
 
 
 
