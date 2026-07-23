@@ -89,3 +89,6 @@ dist/
 *.tmp
 *.bak
 *.swp
+
+# Qdrant
+qdrant/
