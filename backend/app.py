@@ -1,5 +1,5 @@
 from src.ingestion.ingest import IngestionPipeline
-from src.retrieval.retrieval import RetrievalPipeline
+from src.rag.pipeline import RAGPipeline
 
 def main():
     print("Observe & Understand")
@@ -7,22 +7,25 @@ def main():
     ingest_pipeline = IngestionPipeline(documents_path="data/documents")
 
     ingest_pipeline.run()
-    print("Ingestio COmplete")
 
-    retrieval_pipeline = RetrievalPipeline()
+    print("Ingestion Complete")
 
-    results = retrieval_pipeline.search(
-        "What is distributed tracing?"
-    )
+    rag_pipeline = RAGPipeline()
 
-    if not results:
-        print(f"Either retrive failed or no results")
+    while True:
+        question = input("\nAsk a question (or 'exit'): ")
 
-    for result in results:
-        print(result.score)
-        print(result.source)
-        print(result.content)
-        print("-" * 50)
+        if question.lower() == "exit":
+            break
 
+        response = rag_pipeline.ask(question)
+
+        print("\nAnswer")
+        print(response.answer)
+
+        print("\nSources")
+        for chunk in response.retrieved_chunks:
+            print(f"- {chunk.source} ({chunk.score:.4f})")
+        
 if __name__ == "__main__":
     main()
