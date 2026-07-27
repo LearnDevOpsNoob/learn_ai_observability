@@ -1,5 +1,5 @@
 from typing import List
-from src.config import CHUNK_OVERLAP, CHUNK_SIZE
+from src.config.config import CHUNK_OVERLAP, CHUNK_SIZE
 
 class TextChunker:
     """Splits text into fixed-size overlapping chunks."""

@@ -1,15 +1,12 @@
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import Distance, VectorParams, PointStruct
-from src.config import settings
+from src.config.config import settings
 
 from src.models.retrieval import RetrievedChunk
 
 class VectorDB:
     def __init__(self):
-        self.client = QdrantClient(
-            host=settings.qdrant_host,
-            port=settings.qdrant_port
-        )
+        self.client = QdrantClient(url=settings.qdrant_url)
 
         self.collection_name = settings.collection_name
 

@@ -1,5 +1,22 @@
 services:
 
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+
+    container_name: rag-backend
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    networks:
+      - app-net
+    depends_on:
+      - qdrant
+        # condition: service_healthy
+
   qdrant:
     image: qdrant/qdrant:latest
     container_name: observe-qdrant
@@ -10,5 +27,20 @@ services:
 
     volumes:
       - ./qdrant:/qdrant/storage
+      # - ./qdrant_data:/qdrant/storage -- when using named volume later on.
 
     restart: unless-stopped
+    networks:
+      - app-net
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5  
+    
+# volumes:
+#   qdrant_data:
+
+networks:
+  app-net:
+    driver: bridge

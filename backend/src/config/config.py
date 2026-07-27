@@ -9,16 +9,19 @@ class Settings:
     openai_api_key: str
     openai_api_endpoint: str
     openai_model: str
-    qdrant_host: str
-    qdrant_port: int
+    openai_embed_model: str
+
+    qdrant_url: int
     collection_name: str
 
 settings = Settings(
     openai_api_key=os.getenv("OPENAI_API_KEY", ""),
     openai_api_endpoint="https://models.github.ai/inference",
-    openai_model="openai/gpt-4o",
-    qdrant_host=os.getenv("QDRANT_HOST", "localhost"),
-    qdrant_port=int(os.getenv("QDRANT_PORT", "6333")),
+
+    openai_model=os.getenv("OPENAI_MODEL", "openai/gpt-4o"),
+    openai_embed_model=os.getenv("EMBEDDING_MODEL", "openai/text-embedding-3-small"),
+
+    qdrant_url=os.getenv("QDRANT_URL", "http://localhost:6333"),
     collection_name=os.getenv("QDRANT_COLLECTION", "research_docs")    
 )    
 

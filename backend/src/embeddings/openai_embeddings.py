@@ -1,12 +1,12 @@
 from openai import OpenAI
 
-from src.config import settings
+from src.config.config import settings
 
 
 class OpenAIEmbedding:
     """Service responsible for generating text embeddings."""
 
-    MODEL_NAME = "text-embedding-3-small"
+    MODEL_NAME = settings.openai_embed_model
     DIMENSIONS = 1536
 
     def __init__(self):

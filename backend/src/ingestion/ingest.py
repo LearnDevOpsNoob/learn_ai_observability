@@ -3,9 +3,11 @@ from src.ingestion.chunker import TextChunker
 from src.embeddings.openai_embeddings import OpenAIEmbedding
 from src.db.vectordb import VectorDB
 
+from src.config.config import CHUNK_OVERLAP, CHUNK_SIZE
 
-from src.config import CHUNK_OVERLAP, CHUNK_SIZE
+from src.config.logging import get_logger
 
+logger = get_logger(__name__)
 class IngestionPipeline:
     """Coordinates the document ingestion process."""
 
