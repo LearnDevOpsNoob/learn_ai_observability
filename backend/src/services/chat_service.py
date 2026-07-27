@@ -17,34 +17,36 @@ class ChatService:
         self.pipeline = pipeline
 
     def chat(self, question: str) -> ChatResponse:
-        logger.info("Chat request started.")
 
         start = perf_counter()
 
-        response = self.pipeline.ask(question)
+        logger.info("Chat request started.")
 
-        duration = perf_counter() - start
+        try:
+            response = self.pipeline.ask(question)
 
-        logger.info(
-            "Chat request completed in %.2f ms.",
-            duration * 1000,
-        )
-        
-        return ChatResponse(
-            answer=response.answer,
-            sources=[
-                SourceResponse(
-                    source=chunk.source,
-                    score=chunk.score,
-                )
-                for chunk in response.retrieved_chunks
-            ],
-            metadata=ChatMetadataResponse(
-                model=response.model,
-                token_usage=TokenUsageResponse(
-                    prompt_tokens=response.prompt_tokens,
-                    completion_tokens=response.completion_tokens,
-                    total_tokens=response.total_tokens,
+            duration = (perf_counter() - start) * 1000
+
+            logger.info("Chat request completed in %.2f ms.", duration)
+
+            return ChatResponse(
+                answer=response.answer,
+                sources=[
+                    SourceResponse(
+                        source=chunk.source,
+                        score=chunk.score,
+                    )
+                    for chunk in response.retrieved_chunks
+                ],
+                metadata=ChatMetadataResponse(
+                    model=response.model,
+                    token_usage=TokenUsageResponse(
+                        prompt_tokens=response.prompt_tokens,
+                        completion_tokens=response.completion_tokens,
+                        total_tokens=response.total_tokens,
+                    ),
                 ),
-            ),
-        )
+            )
+        except Exception:
+            logger.exception("Chat request failed.")
+            raise

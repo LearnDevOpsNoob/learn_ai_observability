@@ -17,23 +17,29 @@ class RAGPipeline:
     def ask(self, question: str) -> ChatResponse:
         logger.info("Starting RAG pipeline.")
 
-        logger.info("Retrieving relevant documents.")
-        chunks = self.retrieval_pipeline.search(question)
+        try:
+            logger.info("Retrieving relevant documents.")
+            chunks = self.retrieval_pipeline.search(question)
+    
+            logger.info("Building prompt.")
+            messages = self.prompt_builder.build(question=question, chunks=chunks)
+    
+            logger.info("Generating LLM response.")
+            llm_response = self.llm.generate(messages)
+    
+            logger.info("RAG pipeline completed.")
+            return RAGResponse(
+                answer=llm_response.answer,
+                model=llm_response.model,
+                prompt_tokens=llm_response.prompt_tokens,
+                completion_tokens=llm_response.completion_tokens,
+                total_tokens=llm_response.total_tokens,
+                retrieved_chunks=chunks,
+            )
 
-        logger.info("Building prompt.")
-        messages = self.prompt_builder.build(question=question, chunks=chunks)
+        except Exception:
+            logger.exception("RAG pipeline execution failed.")
+            raise
 
-        logger.info("Generating LLM response.")
-        llm_response = self.llm.generate(messages)
-
-        logger.info("RAG pipeline completed.")
-        return RAGResponse(
-            answer=llm_response.answer,
-            model=llm_response.model,
-            prompt_tokens=llm_response.prompt_tokens,
-            completion_tokens=llm_response.completion_tokens,
-            total_tokens=llm_response.total_tokens,
-            retrieved_chunks=chunks,
-        )
 
         

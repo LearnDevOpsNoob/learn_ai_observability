@@ -15,15 +15,20 @@ class OpenAIChat:
         logger.info(
            "Preparing %d messages for model request.", len(messages)
         )
-        formatted_messages = self._format_messages(messages)
-        logger.info(
-            "Sending completion request to model '%s'.",
-            settings.openai_model,
-        )
-        response = self._call_completion(formatted_messages)
-        chat_response = self._build_chat_response(response)
-        logger.info("AI response generated successfully.")
-        return chat_response
+        try:
+            formatted_messages = self._format_messages(messages)
+            logger.info(
+                "Sending completion request to model '%s'.",
+                settings.openai_model,
+            )
+            response = self._call_completion(formatted_messages)
+            chat_response = self._build_chat_response(response)
+            logger.info("AI response generated successfully.")
+            return chat_response
+
+        except Exception:
+            logger.exception("LLM generation failed.")
+            raise
 
     def _build_chat_response(self, response):
 

@@ -16,12 +16,14 @@ class RetrievalPipeline:
         embedding = self.embedder.embed(question)
         logger.info("Searching knowledge base.")
 
-        results = self.vectordb.similarity_search(
-            query_vector=embedding,
-            limit=TOP_K,
-            score_threshold=SCORE_THRESHOLD
-        )    
-        logger.info(
-            "Retrieved %d relevant chunks.", len(results),
-        )
-        return results
+        try:
+            results = self.vectordb.similarity_search(
+                query_vector=embedding,
+                limit=TOP_K,
+                score_threshold=SCORE_THRESHOLD
+            )    
+            logger.info("Retrieved %d relevant chunks.", len(results))
+            return results
+        except Exception:
+            logger.exception("Knowledge base retrieval failed.")
+            raise    

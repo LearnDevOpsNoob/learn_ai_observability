@@ -5,6 +5,8 @@ from src.api.routes.health import router as health_router
 
 from src.config.logging import configure_logging, get_logger
 
+from src.middleware.request_id import RequestIdMiddleware
+
 configure_logging()
 logger = get_logger(__name__)
 
@@ -18,3 +20,5 @@ logger.info("🚀 FastAPI application initialized.")
 
 app.include_router(health_router)
 app.include_router(chat_router)
+
+app.add_middleware(RequestIdMiddleware)
