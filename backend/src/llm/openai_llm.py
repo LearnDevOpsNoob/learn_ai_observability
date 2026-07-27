@@ -3,6 +3,15 @@ from openai import OpenAI
 from src.config.config import settings
 from src.models.chat import ChatMessage, ChatResponse
 
+from time import perf_counter
+
+from src.config.metrics import (
+    LLM_REQUESTS_TOTAL,
+    LLM_DURATION,
+    PROMPT_TOKENS_TOTAL,
+    COMPLETION_TOKENS_TOTAL,
+)
+
 from src.config.logging import get_logger
 
 logger = get_logger(__name__)
@@ -15,25 +24,38 @@ class OpenAIChat:
         logger.info(
            "Preparing %d messages for model request.", len(messages)
         )
+
+        LLM_REQUESTS_TOTAL.inc()
+
+        formatted_messages = self._format_messages(messages)
+        logger.info(
+            "Sending completion request to model '%s'.", settings.openai_model,
+        )
+
+        start_time = perf_counter()
+
         try:
-            formatted_messages = self._format_messages(messages)
-            logger.info(
-                "Sending completion request to model '%s'.",
-                settings.openai_model,
-            )
             response = self._call_completion(formatted_messages)
-            chat_response = self._build_chat_response(response)
+
+            chat_response = self._build_chat_response(response=response, duration=perf_counter() - start_time)
             logger.info("AI response generated successfully.")
+
             return chat_response
 
         except Exception:
             logger.exception("LLM generation failed.")
             raise
+        finally:
+            LLM_DURATION.observe(perf_counter() - start_time)
 
     def _build_chat_response(self, response):
 
         answer = response.choices[0].message.content or ""
         usage = response.usage
+
+        PROMPT_TOKENS_TOTAL.inc(usage.prompt_tokens)
+        COMPLETION_TOKENS_TOTAL.inc(usage.completion_tokens)
+
         logger.info(
             "Token usage - Prompt: %d | Completion: %d | Total: %d",
             usage.prompt_tokens,

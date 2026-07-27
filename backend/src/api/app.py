@@ -6,6 +6,10 @@ from src.api.routes.health import router as health_router
 from src.config.logging import configure_logging, get_logger
 
 from src.middleware.request_id import RequestIdMiddleware
+from src.middleware.metrics import MetricsMiddleware
+
+from src.config.metrics import get_metrics_app
+
 
 configure_logging()
 logger = get_logger(__name__)
@@ -18,7 +22,12 @@ app = FastAPI(
 
 logger.info("🚀 FastAPI application initialized.")
 
+app.add_middleware(RequestIdMiddleware)
+app.add_middleware(MetricsMiddleware)
+
 app.include_router(health_router)
 app.include_router(chat_router)
 
-app.add_middleware(RequestIdMiddleware)
+
+app.mount("/metrics", get_metrics_app())
+

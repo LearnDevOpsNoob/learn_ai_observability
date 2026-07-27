@@ -89,22 +89,22 @@ Basic Logging
 
 ↓
 
-Phase 2
+✅ Phase 2
 Exception Logging
 
 ↓
 
-Phase 3
+✅ Phase 3
 Request IDs
 
 ↓
 
-Phase 4
+[not yet] Phase 4
 Structured JSON Logging
 
 ↓
 
-Phase 5
+[CURR] Phase 5
 Prometheus Metrics
 
 ↓
@@ -121,5 +121,110 @@ Grafana + Loki + Tempo
 
 Phase 8
 Langfuse AI Observability
+
+```
+
+
+=======
+
+
+Why these metric types?
+
+This is worth understanding now because you'll use them everywhere.
+
+Counter
+
+Only goes up.
+
+1
+2
+3
+4
+5
+
+Examples:
+
+Requests
+Errors
+OpenAI calls
+Tokens consumed
+Gauge
+
+Can go up and down.
+
+2
+3
+1
+4
+2
+
+Examples:
+
+Active requests
+Queue size
+Connected users
+Histogram
+
+Measures distributions.
+
+Instead of one value, it builds latency buckets.
+
+5 ms
+
+12 ms
+
+19 ms
+
+45 ms
+
+900 ms
+
+Later Grafana can answer:
+
+"What's the P95 latency?"
+
+without us writing any code.
+
+
+===
+
+```
+How is the order decided?
+
+FastAPI (Starlette) executes middleware in reverse order of registration on the incoming request.
+
+For example:
+
+app.add_middleware(RequestIdMiddleware)
+app.add_middleware(MetricsMiddleware)
+app.add_middleware(AuthMiddleware)
+
+Incoming request:
+
+Request
+   │
+   ▼
+AuthMiddleware
+   ▼
+MetricsMiddleware
+   ▼
+RequestIdMiddleware
+   ▼
+Route
+
+Outgoing response unwinds in the opposite direction:
+
+Route
+   ▲
+RequestIdMiddleware
+   ▲
+MetricsMiddleware
+   ▲
+AuthMiddleware
+   ▲
+Response
+
+It's like stacking plates—the last one you put on is the first one you take off (LIFO).
+
 
 ```

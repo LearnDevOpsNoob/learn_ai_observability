@@ -4,6 +4,8 @@ from src.llm.openai_llm import OpenAIChat
 from src.models.chat import ChatResponse
 from src.models.rag import RAGResponse
 
+from src.config.metrics import RAG_QUERIES_TOTAL
+
 from src.config.logging import get_logger
 
 logger = get_logger(__name__)
@@ -17,6 +19,8 @@ class RAGPipeline:
     def ask(self, question: str) -> ChatResponse:
         logger.info("Starting RAG pipeline.")
 
+        RAG_QUERIES_TOTAL.inc()
+        
         try:
             logger.info("Retrieving relevant documents.")
             chunks = self.retrieval_pipeline.search(question)
