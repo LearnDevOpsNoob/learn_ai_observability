@@ -37,7 +37,7 @@ class OpenAIChat:
         try:
             response = self._call_completion(formatted_messages)
 
-            chat_response = self._build_chat_response(response=response, duration=perf_counter() - start_time)
+            chat_response = self._build_chat_response(response=response)
             logger.info("AI response generated successfully.")
 
             return chat_response
