@@ -21,3 +21,5 @@ async def chat(request: ChatRequest, chat_service: ChatService = Depends(get_cha
         logger.exception("Failed while generating AI response.")
         raise    
 
+
+

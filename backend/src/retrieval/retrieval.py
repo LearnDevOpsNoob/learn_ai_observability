@@ -1,4 +1,4 @@
-from src.embeddings.openai_embeddings import OpenAIEmbedding
+from src.embeddings.llm_embeddings import OpenAIEmbedding
 from src.db.vectordb import VectorDB
 from src.config.config import TOP_K, SCORE_THRESHOLD
 

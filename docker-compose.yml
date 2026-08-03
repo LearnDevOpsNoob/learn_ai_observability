@@ -39,7 +39,7 @@ services:
     #   retries: 5  
     
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.5.0
     container_name: ai-gateway-prometheus
 
     restart: unless-stopped
@@ -57,8 +57,49 @@ services:
     networks:
       - ai-gateway    
 
+  tempo:
+    image: grafana/tempo:2.8.2
+    container_name: ai-gateway-tempo
+    restart: unless-stopped
+    command: 
+    - "-config.file=/etc/tempo/tempo.yaml"
+    
+    ports:
+      - "3200:3200" # Tempo API
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+
+    volumes:
+    - ./infra/docker/tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+    - tempo_data:/var/tempo
+
+    networks:
+      - ai-gateway
+
+  alloy:
+    image: grafana/alloy:v1.10.2
+    container_name: ai-gateway-alloy
+
+    restart: unless-stopped
+
+    command:
+      - "run"
+      - "/etc/alloy/config.alloy"
+
+    ports:
+      - "12345:12345" # Alloy UI
+
+    volumes:
+      - ./infra/docker/alloy/config.alloy:/etc/alloy/config.alloy:ro
+
+    depends_on:
+      - tempo
+    networks:
+      - ai-gateway
+
+
   grafana:
-    image: grafana/grafana-oss:latest
+    image: grafana/grafana-oss:12.1.0
     container_name: ai-gateway-grafana
 
     restart: unless-stopped
@@ -67,11 +108,13 @@ services:
 
     volumes:
       - grafana_data:/var/lib/grafana
-      - .infra/docker/grafana/provisioning:/var/grafana/provisioning
-      - .infra/docker/grafana/dashboards:/var/grafana/dashboards
+      - ./infra/docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/docker/grafana/dashboards:/var/lib/grafana/dashboards:ro
 
     depends_on:
       - prometheus
+      - alloy
+      - tempo
 
     networks:
       - ai-gateway
@@ -79,8 +122,8 @@ services:
 
 volumes:
   prometheus_data:
-
   grafana_data:
+  tempo_data:
 
 networks:
   ai-gateway:

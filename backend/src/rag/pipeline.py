@@ -1,6 +1,6 @@
 from src.prompt.builder import PromptBuilder
 from src.retrieval.retrieval import RetrievalPipeline
-from src.llm.openai_llm import OpenAIChat
+from src.llm.llm_provider import LLMService
 from src.models.chat import ChatResponse
 from src.models.rag import RAGResponse
 
@@ -14,7 +14,7 @@ class RAGPipeline:
     def __init__(self):
         self.retrieval_pipeline = RetrievalPipeline()
         self.prompt_builder = PromptBuilder()
-        self.llm = OpenAIChat()
+        self.llm = LLMService()
 
     def ask(self, question: str) -> ChatResponse:
         logger.info("Starting RAG pipeline.")

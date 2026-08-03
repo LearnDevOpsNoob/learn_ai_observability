@@ -37,7 +37,8 @@ class VectorDB:
                     vector=vector,
                     payload=payload
                 )
-            ]
+            ],
+            wait=True
         )   
 
 

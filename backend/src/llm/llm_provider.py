@@ -1,4 +1,5 @@
 from openai import OpenAI
+from openai.types.chat import ChatCompletion
 
 from src.config.config import settings
 from src.models.chat import ChatMessage, ChatResponse
@@ -15,9 +16,12 @@ from src.config.metrics import (
 from src.config.logging import get_logger
 
 logger = get_logger(__name__)
-class OpenAIChat:
+class LLMService:
     def __init__(self):
-        self.client = OpenAI(base_url=settings.openai_api_endpoint, api_key=settings.openai_api_key)
+        self.client = OpenAI(
+                base_url=settings.llm_api_endpoint, 
+                api_key=settings.llm_api_key
+            )
 
     def generate(self, messages: list[ChatMessage]) -> ChatResponse:
 
@@ -29,7 +33,8 @@ class OpenAIChat:
 
         formatted_messages = self._format_messages(messages)
         logger.info(
-            "Sending completion request to model '%s'.", settings.openai_model,
+            "Sending completion request to model '%s'.", settings.llm_provider,
+    settings.llm_model,
         )
 
         start_time = perf_counter()
@@ -79,9 +84,9 @@ class OpenAIChat:
             for message in messages
         ]
 
-    def _call_completion(self, messages):
+    def _call_completion(self, messages: list[dict]) -> ChatCompletion:
         return self.client.chat.completions.create(
-            model=settings.openai_model,
+            model=settings.llm_model,
             messages=messages,
         )
 

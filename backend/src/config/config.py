@@ -6,20 +6,41 @@ load_dotenv()
 
 @dataclass(frozen=True)
 class Settings:
-    openai_api_key: str
-    openai_api_endpoint: str
-    openai_model: str
-    openai_embed_model: str
+    llm_provider: str
+    llm_api_key: str
+    llm_api_endpoint: str
+    llm_model: str
+
+    embedding_provider: str
+    embedding_api_key: str
+    embedding_api_endpoint: str
+    embedding_model: str
+    vector_size: int
 
     qdrant_url: int
     collection_name: str
 
 settings = Settings(
-    openai_api_key=os.getenv("OPENAI_API_KEY", ""),
-    openai_api_endpoint="https://models.github.ai/inference",
+    # LLM
+    llm_provider=os.getenv("LLM_PROVIDER", "groq"),
+    llm_api_key=os.getenv("GROQ_API_KEY", ""),
+    llm_api_endpoint="https://api.groq.com/openai/v1",
+    llm_model=os.getenv(
+        "LLM_MODEL",
+        "openai/gpt-oss-120b",
+    ),
 
-    openai_model=os.getenv("OPENAI_MODEL", "openai/gpt-4o"),
-    openai_embed_model=os.getenv("EMBEDDING_MODEL", "openai/text-embedding-3-small"),
+    # Embeddings
+    embedding_provider=os.getenv("EMBED_PROVIDER", "voyage"),
+    embedding_api_key=os.getenv("VOYAGE_API_KEY", ""),
+    embedding_api_endpoint="https://api.voyageai.com/v1",
+    embedding_model=os.getenv(
+        "EMBEDDING_MODEL",
+        "voyage-3-lite",
+    ),
+    vector_size=int(
+        os.getenv("EMBEDDING_DIMENSIONS", 1024)
+    ),
 
     qdrant_url=os.getenv("QDRANT_URL", "http://localhost:6333"),
     collection_name=os.getenv("QDRANT_COLLECTION", "research_docs")    
