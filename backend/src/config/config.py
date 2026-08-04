@@ -20,6 +20,11 @@ class Settings:
     qdrant_url: int
     collection_name: str
 
+    langfuse_public_key: str
+    langfuse_secret_key: str
+    langfuse_host: str
+
+
 settings = Settings(
     # LLM
     llm_provider=os.getenv("LLM_PROVIDER", "groq"),
@@ -44,6 +49,13 @@ settings = Settings(
 
     qdrant_url=os.getenv("QDRANT_URL", "http://localhost:6333"),
     collection_name=os.getenv("QDRANT_COLLECTION", "research_docs")    
+
+    # Langfuse Settup
+    langfuse_public_key=os.getenv("LANGFUSE_PUBLIC_KEY", ""),
+    langfuse_secret_key=os.getenv("LANGFUSE_SECRET_KEY", ""),
+    langfuse_host=os.getenv("LANGFUSE_BASE_URL", ""),
+
+
 )    
 
 
