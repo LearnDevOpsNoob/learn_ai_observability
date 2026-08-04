@@ -91,12 +91,31 @@ services:
 
     volumes:
       - ./infra/docker/alloy/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 
     depends_on:
       - tempo
     networks:
       - ai-gateway
 
+  loki:
+    image: grafana/loki:3.4.2
+    container_name: ai-gateway-loki
+    restart: unless-stopped
+
+    ports:
+      - "3100:3100"
+
+    command:
+      - "-config.file=/etc/loki/config.yaml"
+
+    volumes:
+      - ./infra/docker/loki/config.yaml:/etc/loki/config.yaml
+      - loki_data:/loki
+
+    networks:
+      - ai-gateway  
 
   grafana:
     image: grafana/grafana-oss:12.1.0
@@ -115,6 +134,7 @@ services:
       - prometheus
       - alloy
       - tempo
+      - loki
 
     networks:
       - ai-gateway
@@ -124,6 +144,7 @@ volumes:
   prometheus_data:
   grafana_data:
   tempo_data:
+  loki_data:
 
 networks:
   ai-gateway:

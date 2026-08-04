@@ -42,6 +42,7 @@ WORKDIR /app
 
 ENV UV_COMPILE_BYTECODE=1
 ENV UV_LINK_MODE=copy
+ENV UV_PYTHON_DOWNLOADS=never
 
 COPY pyproject.toml uv.lock ./
 

@@ -1,10 +1,13 @@
 import logging
 import sys
+from src.observability.tracing import get_current_trace_id
 from src.middleware.request_id import request_id_context
 
 class RequestIdFilter(logging.Filter):
     def filter(self, record):
         record.request_id = request_id_context.get()
+        record.trace_id = get_current_trace_id()
+
         return True
 
 
@@ -13,7 +16,7 @@ def configure_logging() -> None:
     handler.addFilter(RequestIdFilter())
 
     formatter = logging.Formatter(
-        "%(asctime)s | %(levelname)-8s | [%(request_id)s] | %(name)s | %(message)s"
+        "%(asctime)s | %(levelname)-8s | [%(request_id)s] | [%(trace_id)s] | %(name)s | %(message)s"
     )
 
     handler.setFormatter(formatter)

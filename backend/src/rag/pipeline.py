@@ -44,6 +44,3 @@ class RAGPipeline:
         except Exception:
             logger.exception("RAG pipeline execution failed.")
             raise
-
-
-        
