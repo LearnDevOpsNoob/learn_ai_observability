@@ -18,6 +18,7 @@ class TokenUsageResponse(BaseModel):
 class ChatMetadataResponse(BaseModel):
     model: str
     token_usage: TokenUsageResponse
+    trace_id: str
 
 
 class ChatResponse(BaseModel):

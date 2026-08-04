@@ -1,25 +1,52 @@
 from fastapi import APIRouter, Depends
+
 from src.api.schemas import ChatRequest, ChatResponse
 from src.services.chat_service import ChatService
 from src.api.dependencies import get_chat_service
 
 from src.config.logging import get_logger
 
+from opentelemetry.trace import Status, StatusCode
+from src.observability.tracing import get_tracer
+from opentelemetry import trace
+
+from src.observability.tracing import get_current_trace_id
+
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
 logger = get_logger(__name__)
+
+tracer = get_tracer()
+# trace_id = get_current_trace_id()
 
 @router.post("", response_model=ChatResponse)
 async def chat(request: ChatRequest, chat_service: ChatService = Depends(get_chat_service)):
     logger.info("Received POST /chat request.")
 
-    # return chat_service.chat(request.question)
-    try:
-        return chat_service.chat(request.question)
-        
-    except Exception as e:
-        logger.exception("Failed while generating AI response.")
-        raise    
+    with tracer.start_as_current_span("chat_request") as span:
+        span.set_attribute("question.length", len(request.question))
+
+        try:
+            response = chat_service.chat(request.question)
+
+            span = trace.get_current_span()
+
+            # print(span.get_span_context().is_valid)
+            # print('=================TRACE ID=================')
+            # current = trace.get_current_span()
+
+            # print("INLINE:", format(current.get_span_context().trace_id, "032x"))
+            # print("HELPER:", get_current_trace_id())
+
+            span.set_status(Status(StatusCode.OK))
+            return response
+            
+        except Exception as e:
+            span.record_exception(e)
+            span.set_status(Status(StatusCode.ERROR))
+
+            logger.exception("Failed while generating AI response.")
+            raise    
 
 
 
