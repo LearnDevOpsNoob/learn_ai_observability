@@ -29,26 +29,14 @@ settings = Settings(
     # LLM
     llm_provider=os.getenv("LLM_PROVIDER", "groq"),
     llm_api_key=os.getenv("GROQ_API_KEY", ""),
-    llm_api_endpoint=os.getenv(
-        "LLM_API_ENDPOINT",
-        "https://api.groq.com/openai/v1",
-    ),
-    llm_model=os.getenv(
-        "LLM_MODEL",
-        "openai/gpt-oss-120b",
-    ),
+    llm_api_endpoint=os.getenv("LLM_API_ENDPOINT", ""),
+    llm_model=os.getenv("LLM_MODEL", ""),
 
     # Embeddings
-    embedding_provider=os.getenv("EMBED_PROVIDER", "voyage"),
-    embedding_api_key=os.getenv("VOYAGE_API_KEY", ""),
-    embedding_api_endpoint=os.getenv(
-        "EMBEDDING_API_ENDPOINT",
-        "https://api.voyageai.com/v1",
-    ),
-    embedding_model=os.getenv(
-        "EMBEDDING_MODEL",
-        "voyage-3-lite",
-    ),
+    embedding_provider=os.getenv("EMBED_PROVIDER", ""),
+    embedding_api_key=os.getenv("JINAAI_API_KEY", ""),
+    embedding_api_endpoint=os.getenv("EMBEDDING_API_ENDPOINT", ""),
+    embedding_model=os.getenv("EMBEDDING_MODEL", ""),
     vector_size=int(
         os.getenv("EMBEDDING_DIMENSIONS", 1024)
     ),

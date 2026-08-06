@@ -26,7 +26,6 @@ async def ingest(
         logger.exception("Document ingestion failed.")
         raise
 
-
 @router.delete("")
 async def delete_documents(
     document_service: DocumentService = Depends(get_document_service),

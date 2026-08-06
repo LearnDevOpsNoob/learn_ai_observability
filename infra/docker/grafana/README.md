@@ -1,0 +1,1 @@
+next comit -> Improved Tracing Span for ingestion and retrieval pipelines

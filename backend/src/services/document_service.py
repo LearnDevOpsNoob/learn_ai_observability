@@ -4,6 +4,9 @@ from src.db.vectordb import VectorDB
 from src.embeddings.llm_embeddings import OpenAIEmbedding
 from src.ingestion.ingest import IngestionPipeline
 
+from src.api.schemas import IngestResponse
+from src.observability.tracing import get_current_trace_id
+
 logger = get_logger(__name__)
 
 
@@ -27,15 +30,17 @@ class DocumentService:
             vector_size=self.embedder.dimensions
         )
 
-        self.pipeline.run()
+        points = self.pipeline.run()
 
         logger.info("Document ingestion completed.")
 
-        return {
-            "status": "success",
-            "message": "Documents indexed successfully.",
-        }
+        return IngestResponse(
+            message="Documents indexed successfully.",
+            indexed_points=points,
+            trace_id=get_current_trace_id()
+        ) 
 
+    
     def delete(self) -> dict:
         """Delete all indexed documents."""
 

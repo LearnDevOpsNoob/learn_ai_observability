@@ -5,6 +5,8 @@ from openai.types.chat import ChatCompletion
 from src.config.config import settings
 from src.models.chat import ChatMessage, ChatResponse
 
+from src.observability.tracing import get_tracer
+
 from time import perf_counter
 
 from src.config.metrics import (
@@ -23,29 +25,24 @@ class LLMService:
                 base_url=settings.llm_api_endpoint, 
                 api_key=settings.llm_api_key
             )
-        print(type(self.client))
-        print(self.client.__class__.__module__)
-
+        self.tracer = get_tracer()
+        
     def generate(self, messages: list[ChatMessage]) -> ChatResponse:
 
-        logger.info(
-           "Preparing %d messages for model request.", len(messages)
-        )
+        logger.info("Preparing %d messages for model request.", len(messages))
 
         LLM_REQUESTS_TOTAL.inc()
 
         formatted_messages = self._format_messages(messages)
-        logger.info(
-            "Sending completion request to model '%s'.", settings.llm_provider,
-    settings.llm_model,
-        )
+        logger.info("Sending completion request to model '%s'.", settings.llm_provider, settings.llm_model)
 
         start_time = perf_counter()
 
         try:
             response = self._call_completion(formatted_messages)
 
-            chat_response = self._build_chat_response(response=response)
+            with self.tracer.start_as_current_span("parse_response"):
+                chat_response = self._build_chat_response(response=response)
             logger.info("AI response generated successfully.")
 
             return chat_response

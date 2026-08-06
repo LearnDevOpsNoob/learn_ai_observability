@@ -6,8 +6,9 @@ from src.embeddings.llm_embeddings import OpenAIEmbedding
 from src.config.config import CHUNK_OVERLAP, CHUNK_SIZE
 from src.config.logging import get_logger
 
-logger = get_logger(__name__)
+from src.observability.tracing import trace_step, get_tracer
 
+logger = get_logger(__name__)
 
 class IngestionPipeline:
     """Coordinates the document ingestion process."""
@@ -20,57 +21,65 @@ class IngestionPipeline:
         )
         self.embedder = embedder
         self.vectordb = VectorDB()
+        self.tracer = get_tracer()
 
-    def run(self) -> None:
+
+    @trace_step("ingest_documents")
+    def run(self):
         """Load, chunk, embed and index documents."""
 
         logger.info("=== INGESTION PIPELINE STARTED ===")
-        logger.info("Loading documents...")
 
-        try:
-            documents = self.loader.load()
-        except Exception:
-            logger.exception("Loader failed.")
-            raise
+        with self.tracer.start_as_current_span("load_documents"):
+
+            logger.info("Loading documents...")
+
+            try:
+                documents = self.loader.load()
+            except Exception:
+                logger.exception("Loader failed.")
+                raise
 
         logger.info("Loaded %d document(s).", len(documents))
 
         point_id = 0
 
         for document in documents:
-            chunks = self.chunker.chunk(document["content"])
+            with self.tracer.start_as_current_span("process_document") as span:
+                span.set_attribute("document.source", document["source"])
 
-            logger.info(
-                "Processing '%s' (%d chunks).",
-                document["source"],
-                len(chunks),
-            )
+                with self.tracer.start_as_current_span("chunk_documents"):
 
-            # Generate embeddings for all chunks in a single request
-            embeddings = self.embedder.embed_batch(chunks)
+                    chunks = self.chunker.chunk(document["content"])
 
-            for chunk_index, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
-                payload = {
-                    "source": document["source"],
-                    "chunk_id": chunk_index,
-                    "content": chunk,
-                }
+                    logger.info("Processing '%s' (%d chunks).",
+                        document["source"],
+                        len(chunks),
+                    )
 
-                logger.info(
-                    "Upserting point %d (%d dims).",
-                    point_id,
-                    len(embedding),
-                )
+                with self.tracer.start_as_current_span("generate_embeddings"):
+                # Generate embeddings for all chunks in a single request
+                    embeddings = self.embedder.embed_batch(chunks)
 
-                self.vectordb.upsert(
-                    point_id=point_id,
-                    vector=embedding,
-                    payload=payload,
-                )
+                with self.tracer.start_as_current_span("upsert_vectors"):
 
-                point_id += 1
+                    for chunk_index, (chunk, embedding) in enumerate(zip(chunks, embeddings)):
+                        payload = {
+                            "source": document["source"],
+                            "chunk_id": chunk_index,
+                            "content": chunk,
+                        }
+
+                        logger.info(
+                            "Upserting point %d (%d dims).", point_id, len(embedding))
+
+                        self.vectordb.upsert(point_id=point_id, vector=embedding, payload=payload)
+
+                        point_id += 1
 
         logger.info(
             "Ingestion completed successfully. Indexed %d point(s).",
             point_id,
         )
+
+        return point_id

@@ -1,6 +1,5 @@
 from pydantic import BaseModel, Field
 
-
 class ChatRequest(BaseModel):
     question: str = Field(min_length=3) 
 
@@ -26,6 +25,10 @@ class ChatResponse(BaseModel):
     sources: list[SourceResponse]
     metadata: ChatMetadataResponse
 
-
+class IngestResponse(BaseModel):
+    message: str
+    indexed_points: int
+    trace_id: str
+    
 class HealthResponse(BaseModel):
     status: str
