@@ -1,0 +1,21 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.139.2",
+    "langfuse>=4.14.2",
+    "openai>=2.46.0",
+    "opentelemetry-api>=1.44.0",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.44.0",
+    "opentelemetry-instrumentation-fastapi>=0.65b0",
+    "opentelemetry-instrumentation-httpx>=0.65b0",
+    "opentelemetry-sdk>=1.44.0",
+    "prometheus-client>=0.26.0",
+    "pydantic>=2.13.4",
+    "python-dotenv>=1.2.2",
+    "qdrant-client>=1.18.0",
+    "uvicorn>=0.51.0",
+]
