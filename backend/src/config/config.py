@@ -11,6 +11,10 @@ class Settings:
     llm_api_endpoint: str
     llm_model: str
 
+    llm_temperature: float
+    llm_max_tokens: int
+    llm_top_p: float
+
     embedding_provider: str
     embedding_api_key: str
     embedding_api_endpoint: str
@@ -31,6 +35,10 @@ settings = Settings(
     llm_api_key=os.getenv("GROQ_API_KEY", ""),
     llm_api_endpoint=os.getenv("LLM_API_ENDPOINT", ""),
     llm_model=os.getenv("LLM_MODEL", ""),
+
+    llm_temperature=float(os.getenv("LLM_TEMPERATURE", "0.2")),
+    llm_max_tokens=int(os.getenv("LLM_MAX_TOKENS", "2048")),
+    llm_top_p=float(os.getenv("LLM_TOP_P", "1.0")),
 
     # Embeddings
     embedding_provider=os.getenv("EMBED_PROVIDER", ""),

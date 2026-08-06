@@ -1,4 +1,5 @@
 from src.observability.tracing import get_current_trace_id
+# from src.observability.langfuse import get_langfuse
 from src.api.schemas import (
     ChatResponse,
     SourceResponse,
@@ -6,6 +7,7 @@ from src.api.schemas import (
     TokenUsageResponse,
 )
 from src.rag.pipeline import RAGPipeline
+from src.config.config import settings
 from src.observability.tracing import trace_step
 
 from opentelemetry import trace
@@ -19,6 +21,7 @@ logger = get_logger(__name__)
 class ChatService:
     def __init__(self, pipeline: RAGPipeline):
         self.pipeline = pipeline
+        # self.langfuse = get_langfuse()
 
     @trace_step("chat_request")
     def chat(self, question: str) -> ChatResponse:
@@ -30,6 +33,12 @@ class ChatService:
         
         logger.info("Chat request started.")
 
+        # with self.langfuse.propagate_attributes(
+        #     metadata={
+        #         "provider": settings.llm_provider,
+        #         "model": settings.llm_model
+        #     }
+        # ):
         response = self.pipeline.ask(question)
 
         duration = (perf_counter() - start) * 1000

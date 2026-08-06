@@ -71,6 +71,14 @@ def trace_step(name: str, attributes: dict[str, Any] | None = None):
         def wrapper(*args, **kwargs):
             tracer = get_tracer()
 
+            print(f"DECORATOR HIT -> {name}")
+
+            print(tracer)
+
+            with tracer.start_as_current_span(name):
+                print(f"SPAN CREATED -> {name}")
+                return func(*args, **kwargs)
+
             with tracer.start_as_current_span(name) as span:
                 if attributes:
                     for key, value in attributes.items():

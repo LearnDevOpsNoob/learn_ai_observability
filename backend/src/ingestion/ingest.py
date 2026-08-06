@@ -29,7 +29,7 @@ class IngestionPipeline:
         """Load, chunk, embed and index documents."""
 
         logger.info("=== INGESTION PIPELINE STARTED ===")
-
+        
         with self.tracer.start_as_current_span("load_documents"):
 
             logger.info("Loading documents...")
@@ -77,9 +77,6 @@ class IngestionPipeline:
 
                         point_id += 1
 
-        logger.info(
-            "Ingestion completed successfully. Indexed %d point(s).",
-            point_id,
-        )
+        logger.info("Ingestion completed successfully. Indexed %d point(s).", point_id)
 
         return point_id

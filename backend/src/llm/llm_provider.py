@@ -6,6 +6,7 @@ from src.config.config import settings
 from src.models.chat import ChatMessage, ChatResponse
 
 from src.observability.tracing import get_tracer
+# from src.observability.langfuse import get_langfuse
 
 from time import perf_counter
 
@@ -26,6 +27,7 @@ class LLMService:
                 api_key=settings.llm_api_key
             )
         self.tracer = get_tracer()
+        # self.langfuse = get_langfuse()
         
     def generate(self, messages: list[ChatMessage]) -> ChatResponse:
 
@@ -43,6 +45,7 @@ class LLMService:
 
             with self.tracer.start_as_current_span("parse_response"):
                 chat_response = self._build_chat_response(response=response)
+
             logger.info("AI response generated successfully.")
 
             return chat_response
@@ -88,6 +91,9 @@ class LLMService:
         return self.client.chat.completions.create(
             model=settings.llm_model,
             messages=messages,
+            temperature=settings.llm_temperature,
+            top_p=settings.llm_top_p,
+            max_tokens=settings.llm_max_tokens
         )
 
 
