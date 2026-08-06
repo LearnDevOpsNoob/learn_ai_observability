@@ -22,7 +22,10 @@ env/
 
 .env
 .env.*
+.langfuse.env
 
+!.env.example
+!.langfuse.example.env
 # ============================================
 # ChromaDB
 # ============================================
@@ -88,3 +91,6 @@ dist/
 *.tmp
 *.bak
 *.swp
+
+# Qdrant
+qdrant/
