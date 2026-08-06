@@ -1,21 +1,20 @@
 from fastapi import APIRouter, Depends
 
-from src.api.schemas import ChatRequest, ChatResponse
-from src.services.chat_service import ChatService
+from opentelemetry import trace
+from opentelemetry.trace import Status, StatusCode
+
 from src.api.dependencies import get_chat_service
+from src.api.schemas import ChatRequest, ChatResponse
 
 from src.config.logging import get_logger
-
-from opentelemetry.trace import Status, StatusCode
 from src.observability.tracing import get_tracer
-from opentelemetry import trace
+from src.observability.langfuse import get_langfuse
 
-from src.observability.tracing import get_current_trace_id
+from src.services.chat_service import ChatService
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
 logger = get_logger(__name__)
-
 tracer = get_tracer()
 # trace_id = get_current_trace_id()
 

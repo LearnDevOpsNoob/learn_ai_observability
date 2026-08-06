@@ -1,4 +1,5 @@
-from openai import OpenAI
+# from openai import OpenAI
+from langfuse.openai import OpenAI
 from openai.types.chat import ChatCompletion
 
 from src.config.config import settings
@@ -22,6 +23,8 @@ class LLMService:
                 base_url=settings.llm_api_endpoint, 
                 api_key=settings.llm_api_key
             )
+        print(type(self.client))
+        print(self.client.__class__.__module__)
 
     def generate(self, messages: list[ChatMessage]) -> ChatResponse:
 
