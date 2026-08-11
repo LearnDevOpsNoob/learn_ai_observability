@@ -2,6 +2,8 @@ from openai import OpenAI
 
 from src.config.config import settings
 
+from opentelemetry import trace 
+
 from src.config.logging import get_logger
 
 logger = get_logger(__name__)
@@ -22,6 +24,12 @@ class OpenAIEmbedding:
         """
         Generate an embedding for the given text.
         """
+        span = trace.get_current_span()
+
+        span.set_attribute("embedding.provider", settings.embedding_provider)
+        span.set_attribute("embedding.model", self.MODEL_NAME)
+        span.set_attribute("embedding.input_length", len(text))
+        span.set_attribute("embedding.dimensions", self.DIMENSIONS)
 
         response = self.client.embeddings.create(
             model=self.MODEL_NAME,
@@ -38,6 +46,13 @@ class OpenAIEmbedding:
         return embedding
 
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        span = trace.get_current_span()
+
+        span.set_attribute("embedding.provider", settings.embedding_provider)
+        span.set_attribute("embedding.model", self.MODEL_NAME)
+        span.set_attribute("embedding.batch_size", len(texts))
+        span.set_attribute("embedding.dimensions", self.DIMENSIONS)
+
         response = self.client.embeddings.create(
             model=self.MODEL_NAME,
             input=texts,

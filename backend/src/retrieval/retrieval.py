@@ -2,13 +2,14 @@ from src.embeddings.llm_embeddings import OpenAIEmbedding
 from src.db.vectordb import VectorDB
 from src.config.config import TOP_K, SCORE_THRESHOLD
 
+from opentelemetry import trace
+
 from time import perf_counter
 
 from src.config.metrics import (
     RETRIEVAL_DURATION,
     RETRIEVED_CHUNKS_TOTAL
 )
-
 
 from src.config.logging import get_logger
 
@@ -21,6 +22,12 @@ class RetrievalPipeline:
 
 
     def search(self, question: str):
+        span = trace.get_current_span()
+
+        span.set_attribute("retrieval.query_length", len(question))
+        span.set_attribute("retrieval.top_k", TOP_K)
+        span.set_attribute("retrieval.score_threshold", SCORE_THRESHOLD)
+
         embedding = self.embedder.embed(question)
         logger.info("Searching knowledge base.")
 
@@ -34,6 +41,14 @@ class RetrievalPipeline:
             )    
 
             RETRIEVED_CHUNKS_TOTAL.inc(len(results))
+
+            span.set_attribute("retrieval.result_count", len(results))
+
+            if results:
+                span.set_attribute(
+                    "retrieval.sources",
+                    ",".join(sorted(set(chunk.source for chunk in results)))
+                )
 
             logger.info("Retrieved %d relevant chunks.", len(results))
             return results

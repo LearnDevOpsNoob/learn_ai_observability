@@ -2,6 +2,8 @@ from src.models.chat import ChatMessage
 from src.models.retrieval import RetrievedChunk
 from src.prompt.prompts import SYSTEM_PROMPT, CONTEXT_SEPARATOR
 
+from opentelemetry import trace
+
 class PromptBuilder:
     """
     Builds chat messages for the LLM from retrieved context.
@@ -23,7 +25,6 @@ class PromptBuilder:
         sections = []
 
         if not chunks:
-            print('No chunks')
             return False
 
         for chunk in chunks:
@@ -36,8 +37,19 @@ class PromptBuilder:
             
 
     def build(self, question: str, chunks: list[RetrievedChunk]) -> list[RetrievedChunk]:
+        span = trace.get_current_span()
+
         system_prompt = self._build_system_prompt()
         user_prompt = self._build_user_prompt(question, chunks)
+
+        span.set_attribute("prompt.chunk_count", len(chunks))
+        span.set_attribute("prompt.question_length", len(question))
+        span.set_attribute("prompt.system_length", len(system_prompt))
+        span.set_attribute("prompt.user_length", len(user_prompt))
+        span.set_attribute(
+            "prompt.total_length",
+            len(system_prompt) + len(user_prompt),
+        )
 
         return [
             ChatMessage(
