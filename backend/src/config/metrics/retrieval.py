@@ -9,3 +9,8 @@ RETRIEVED_CHUNKS_TOTAL = Counter(
     "retrieved_chunks_total",
     "Total retrieved chunks",
 )
+
+VECTOR_SEARCH_DURATION = Histogram(
+    "vector_search_duration_seconds",
+    "Vector database search duration",
+)

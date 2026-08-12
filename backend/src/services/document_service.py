@@ -30,13 +30,20 @@ class DocumentService:
             vector_size=self.embedder.dimensions
         )
 
-        points = self.pipeline.run()
+        stats = self.pipeline.run()
 
-        logger.info("Document ingestion completed.")
+        logger.info(
+            "Document ingestion completed | "
+            "endpoint=/documents/ingest | "
+            "documents=%d | chunks=%d | vectors=%d",
+            stats["documents"],
+            stats["chunks"],
+            stats["vectors"],
+        )
 
         return IngestResponse(
             message="Documents indexed successfully.",
-            indexed_points=points,
+            indexed_points=stats,
             trace_id=get_current_trace_id()
         ) 
 

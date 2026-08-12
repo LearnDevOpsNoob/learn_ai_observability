@@ -48,8 +48,13 @@ class ChatService:
         span.set_attribute("retrieval.results", len(response.retrieved_chunks))
         span.set_attribute("llm.total_tokens", response.total_tokens)
 
-        logger.info("Chat request completed in %.2f ms.", duration)
-
+        logger.info(
+            "Chat request completed | endpoint=/chat | provider=%s | model=%s | retrieval=%d | duration=%.2f ms",
+            settings.llm_provider,
+            response.model,
+            len(response.retrieved_chunks),
+            duration,
+        )
 
         # print('=================TRACE ID=================')
         # print("IN SERVICE:", get_current_trace_id())

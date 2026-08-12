@@ -40,16 +40,17 @@ class IngestionPipeline:
                 logger.exception("Loader failed.")
                 raise
 
-        logger.info("Loaded %d document(s).", len(documents))
-
         point_id = 0
+        chunk_count = 0
+        document_count = len(documents)
+
+        logger.info("Loaded %d document(s).", document_count)
 
         for document in documents:
             with self.tracer.start_as_current_span("process_document") as span:
                 span.set_attribute("document.source", document["source"])
 
                 with self.tracer.start_as_current_span("chunk_documents"):
-
                     chunks = self.chunker.chunk(document["content"])
 
                     logger.info("Processing '%s' (%d chunks).",
@@ -76,7 +77,16 @@ class IngestionPipeline:
                         self.vectordb.upsert(point_id=point_id, vector=embedding, payload=payload)
 
                         point_id += 1
-
-        logger.info("Ingestion completed successfully. Indexed %d point(s).", point_id)
-
-        return point_id
+                        
+        logger.info(
+                    "Ingestion completed successfully. "
+                    "Documents=%d | Chunks=%d | Vectors=%d",
+                    document_count,
+                    chunk_count,
+                    point_id,
+                )
+        return {
+            "documents": document_count,
+            "chunks": chunk_count,
+            "vectors": point_id,
+        }
