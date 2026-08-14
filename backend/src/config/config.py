@@ -28,6 +28,11 @@ class Settings:
     langfuse_secret_key: str
     langfuse_base_url: str
 
+    evaluation_llm_provider: str
+    evaluation_llm_api_key: str
+    evaluation_llm_api_endpoint: str
+    evaluation_llm_model: str
+
 
 settings = Settings(
     # LLM
@@ -55,7 +60,13 @@ settings = Settings(
     # Langfuse Setup
     langfuse_public_key=os.getenv("LANGFUSE_PUBLIC_KEY", ""),
     langfuse_secret_key=os.getenv("LANGFUSE_SECRET_KEY", ""),
-    langfuse_base_url=os.getenv("LANGFUSE_BASE_URL", "")
+    langfuse_base_url=os.getenv("LANGFUSE_BASE_URL", ""),
+
+    # Evaluation Provider
+    evaluation_llm_provider=os.getenv("EVALUATION_LLM_PROVIDER","groq"),
+    evaluation_llm_api_key=os.getenv("EVALUATION_LLM_API_KEY", ""),
+    evaluation_llm_api_endpoint=os.getenv("EVALUATION_LLM_API_ENDPOINT", ""),
+    evaluation_llm_model=os.getenv("EVALUATION_LLM_MODEL", ""),
 )    
 
 

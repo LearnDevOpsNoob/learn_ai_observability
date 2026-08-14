@@ -6,6 +6,8 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.139.2",
+    "groq>=1.6.0",
+    "langchain-community>=0.3.0,<0.4",
     "langfuse>=4.14.2",
     "openai>=2.46.0",
     "opentelemetry-api>=1.44.0",
@@ -17,5 +19,6 @@ dependencies = [
     "pydantic>=2.13.4",
     "python-dotenv>=1.2.2",
     "qdrant-client>=1.18.0",
+    "ragas>=0.4.3",
     "uvicorn>=0.51.0",
 ]
