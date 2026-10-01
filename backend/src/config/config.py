@@ -32,7 +32,7 @@ class Settings:
     evaluation_llm_api_key: str
     evaluation_llm_api_endpoint: str
     evaluation_llm_model: str
-
+    evaluation_db_url: str
 
 settings = Settings(
     # LLM
@@ -67,6 +67,7 @@ settings = Settings(
     evaluation_llm_api_key=os.getenv("EVALUATION_LLM_API_KEY", ""),
     evaluation_llm_api_endpoint=os.getenv("EVALUATION_LLM_API_ENDPOINT", ""),
     evaluation_llm_model=os.getenv("EVALUATION_LLM_MODEL", ""),
+    evaluation_db_url=os.getenv("EVALUATION_DATABASE_URL", ""),
 )    
 
 

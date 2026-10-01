@@ -254,7 +254,26 @@ services:
     networks:
       - ai-gateway    
 
+
+    evaluation-postgres:
+      image: postgres:16
+      container_name: ai-gateway-postgres
+
+      restart: unless-stopped
+
+      environment:
+        POSTGRES_DB: ai_gateway
+        POSTGRES_USER: ai_gateway
+        POSTGRES_PASSWORD: ai_gateway
+
+      volumes:
+        - evaluation_postgres:/var/lib/postgresql/data
+
+      networks:
+        - ai-gateway      
+
 volumes:
+  evaluation_postgres:
   prometheus_data:
   grafana_data:
   tempo_data:
